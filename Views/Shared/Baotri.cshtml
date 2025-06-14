@@ -1,4 +1,5 @@
-﻿@{}
+﻿@model MaintainPageViewModel
+
 <!DOCTYPE html>
 <html>
 <!--phần đầu-->
@@ -18,6 +19,7 @@
     </style>
 </head>
 <body>
+    <form asp-action="Baotri" method="post">
         <div class="surgery-schedule">
             <div class="surgery-major">
                 <div class="surgery-title">
@@ -40,7 +42,7 @@
                 <div class="surgery-table">
                     <table id="surgery-table">
                         <div class="wrap-sreach">
-                            <input name="searchString" class="search" style="width: 21rem;" type="text" placeholder="🔍Điền thông tin">
+                            <input name="searchString" id="searchInput" class="search" style="width: 21rem;" type="text" placeholder="🔍Điền thông tin">
 
                             <input type="month" id="filter-date">
 
@@ -53,8 +55,9 @@
                         <table id="dataTable" style="width:100%;">
                             <thead>
                                 <tr>
+                                    <th>Mã ID</th>
                                     <th>Tên thiết bị<br></th>
-                                    <th>Ngày bảo trì</th>
+                                    <th>Ngày bảo trì (dự kiến)</th>
                                     <th>Vị trí hiện tại</th>
                                     <th>Tình trạng</th>
                                     <th> Xem thêm </th>
@@ -62,28 +65,39 @@
                             </thead>
 
                             <tbody>
-                                <tr>
-                                    <td id="facility"> Máy thở Philip </td>
-                                    <td id="facility"> 31/3/2025 </td>
-                                    <td id="facility"> Kho </td>
-                                    <td id="facility"> Chưa bảo trì </td>
-                                    <td id="facility">
-                                        <div class="dropdown">
-                                            <i class="bi bi-three-dots dropdown-toggle-icon" style="cursor: pointer;"></i>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td id="facility"> Máy siêu âm doppler </td>
-                                    <td id="facility"> N/A </td>
-                                    <td id="facility"> Khoa phụ sản </td>
-                                    <td id="facility"> Chưa bảo trì </td>
-                                    <td id="facility">
-                                        <div class="dropdown">
-                                            <i class="bi bi-three-dots dropdown-toggle-icon" style="cursor: pointer;"></i>
-                                        </div>
-                                    </td>
-                                </tr>
+                                @if (Model.MaintainList.PageCount > 0)
+                                {
+                                    foreach (var item in Model.MaintainList.Items)
+                                    {
+                                        <tr>
+                                            <td id="faccility">@item.FK_device_id</td>
+                                            <td id="facility">@item.device_name</td>
+                                            <td id="facility">@item.maintain_date</td>
+                                            <td id="facility">@item.room_name</td>
+                                            <td id="facility">@item.status_name</td>
+                                            <td id="facility">
+                                                <div class="dropdown">
+                                                    <i class="bi bi-three-dots dropdown-toggle-icon" style="cursor: pointer;"></i>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td id="facility">NOT FOUND </td>
+                                        <td id="facility">NOT FOUND </td>
+                                        <td id="facility">NOT FOUND </td>
+                                        <td id="facility">NOT FOUND </td>
+                                        <td id="facility">
+                                            <div class="dropdown">
+                                                <i class="bi bi-three-dots dropdown-toggle-icon" style="cursor: pointer;"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                                
                             </tbody>
 
                         </table>
@@ -96,7 +110,7 @@
                     </table>
                 </div>
             </div>
-        </div>
+        </div> //bảng 
 
         <div class="maintain-data">
             <section class="maintain-title" id="kehoach">
@@ -104,44 +118,52 @@
             </section>
 
             <div class="repair-request-form" style="max-width: none;" onsubmit="handleSubmit(event)">
-                <form action="">
+                <form asp-action="Baotri_Add" method="post">
                     <div class="planer-form">
-                        <label>Thiết bị:</label>
-                        <input type="text" placeholder="Nhập tên thiết bị trong danh sách trên" style="width: 18rem; margin-right: 1rem;" />
+                        <label>Tên thiết bị cần lập lịch:</label>
+                        <select name="btrname" type="text" style="width: 18rem; margin-right: 1rem;" />
+                        @foreach (var item in Model.MaintainForm.devices)
+                        {
+                            <option value="@item.device_id">@item.device_name</option>
+                        }
+                        </select>
 
                         <label>Mã series (mã thiết bị)</label>
-                        <input type="text" style="text-transform: uppercase;" />
+                        <select name="btrID" type="text" style="text-transform: uppercase;" />
+                        @foreach (var item in Model.MaintainForm.devices)
+                        {
+                        <option value="@item.device_id">@item.device_id</option>
+                        }
+                        </select>
 
                         <label>Ngày bảo trì:</label>
-                        <input type="date" />
+                        <input name="Btrdate" type="date"/>
                     </div> <br>
                     <div class="planer-form">
                         <label>Người phụ trách giao nhận thiết bị:</label>
-                        <input type="text" style="margin-right: 1rem;" />
+                        <input name="btrDelivery" type="text" style="margin-right: 1rem;" />
 
                         <label>
-
                             <i class="fa-solid fa-phone" style="margin-right: 0.25rem;"></i>
                             Số điện thoại liên hệ:
                         </label>
-                        <input type="tel" name="phone" pattern="[0-9]{10}" placeholder="0123456789" />
+                        <input type="tel" name="btrDeliPhone" style="margin-left: 0.25rem;" pattern="[0-9]{10}" placeholder="0123456789" />
                     </div><br>
 
                     <div class="planer-form">
                         <label>Người phụ trách bảo trì:</label>
-                        <input type="text" style="margin-right: 1rem;" />
+                        <input name="btrMaintain" type="text" style="margin-right: 1rem;" />
 
                         <label>
                             <i class="fa-solid fa-phone" style="margin-right: 0.25rem;"></i>
                             Số điện thoại liên hệ:
                         </label>
-                        <input type="tel" name="phone" pattern="[0-9]{10}" placeholder="0123456789" />
+                        <input type="tel" name="btrMaintainPhone" style="margin-left: 0.25rem; pattern="[0-9]{10}" placeholder="0123456789" />
                     </div> <br>
                     <button>Lưu</button>
-                    <button>Đặt lại</button>
                 </form>
             </div>
-        </div>
+        </div> //form nhập liệu
 
         <div class="maintain-data">
             <section class="maintain-title" id="thongbao">
@@ -209,7 +231,7 @@
             </div>
         </div>
 
-    <script>
+        <script>
             /* modal */
             function openRescheduleModal(deviceName) {
                 document.getElementById("rescheduleModal").style.display = "flex";
@@ -230,7 +252,7 @@
             });
         </script>
 
-    <script>
+        <script>
             /* gửi nhắc nhở */
             function sendReminder(device, person, phone) {
                 alert(`Đã gửi nhắc cho ${person} (sđt: ${phone}) về thiết bị: ${device}`);
@@ -238,7 +260,7 @@
 
         </script>
 
-    <script>
+        <script>
             /* Dropdown */
             document.addEventListener('DOMContentLoaded', function () {
                 const dropdown = document.getElementById('floatingDropdown');
@@ -271,6 +293,21 @@
                     }
                 });
             });
+            // tìm kiếm 
+            document.getElementById("searchInput").addEventListener("keyup", function () {
+                const filter = this.value.toUpperCase();
+                const rows = document.querySelectorAll("#dataTable tbody tr");
+
+                rows.forEach(row => {
+                    const cell = row.querySelector("td");
+                    if (cell && cell.textContent.toUpperCase().indexOf(filter) > -1) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            });
         </script>
 
+    </form>      
 </body>

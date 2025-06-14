@@ -1,5 +1,4 @@
-﻿@{
-}
+﻿@model DevicePageViewModel
 
 <!DOCTYPE html>
 <html>
@@ -46,27 +45,55 @@
                             </div>
                         </div>
                     </div>
+
+                   
                     <table id="dataTable" style="width:100%;">
                         <thead>
                             <tr>
-                                <th>Mã ID sản phẩm</th>
+                                <th>Mã ID thiết bị</th>
+                                <th>Mã series thiết bị </th>
                                 <th>Tên thiết bị</th>
                                 <th>Vị trí hiện tại</th>
-                                <th>Ngày nhập kho</th>
-                                <th>Ngày xuất kho</th>
                                 <th>Trạng thái hiện tại</th>
+                                <th>Ngày nhập về</th>
                                 <th>Chi tiết</th>
                                 <th>Xóa</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td id="facility"> VENT-PHI-0078</td>
-                                <td id="facility"> Máy thở Philip </td>
-                                <td id="facility"> Khoa Hồi sức tích cực </td>
-                                <td id="facility"> 12/3/2024</td>
-                                <td id="facility"> 2/3/2025 </td >
-                                <td id="facility"> Hoạt động </td>
+                        @if (Model.DeviceList.PageCount > 0) //chưa xử lí ngoại lệ, phải thêm database mới chạy bình thường được :)
+                        {
+                            foreach (var item in Model.DeviceList.Items)
+                        {
+                        <tr>
+                            <td id="facility"> @item.device_id</td>
+                            <td id="facility"> @item.device_seri</td>
+                            <td id="facility"> @item.device_name</td>
+                            <td id="facility"> @item.room_name</td>
+                            <td id="facility"> @item.status_name</td>
+                            <td id="facility"> @item.device_received_date</td>
+                                   <td id="detail">
+                                        <button id="detail">
+                                            <i class="fa-solid fa-circle-info"></i>
+                                        </button>
+                                    </td>
+                                    <td id="delete">
+                                        <button type="button" id="deleteBtn">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </td>
+                        </tr>
+                        }
+                        }
+                        else
+                        {
+                        <tr>
+                            <td id="facility"> NOTHING FOUND </td>
+                            <td id="facility"> NOTHING FOUND</td>
+                            <td id="facility"> NOTHING FOUND</td>
+                            <td id="facility"> NOTHING FOUND</td>
+                            <td id="facility"> NOTHING FOUND </td>
+                                <td id="facility"> NOTHING FOUND </td>
                                 <td id="detail">
                                     <button id="detail">
                                         <i class="fa-solid fa-circle-info"></i>
@@ -77,28 +104,8 @@
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </td>
-                            </tr>
-                        </tbody>
-                        <tbody>
-                            <tr>
-                                <td id="facility"> US-DPL-0332 </td>
-                                <td id="facility"> Máy siêu âm Doopler </td>
-                                <td id="facility"> Khoa Sản </td>
-                                <td id="facility"> 24/4/2024</td>
-                                <td id="facility"> N/A </td >
-                                <td id="facility"> Bảo trì </td>
-                                <td id="detail">
-                                    <button id="detail">
-                                        <i class="fa-solid fa-circle-info"></i>
-                                    </button>
-                                </td>
-                                <td id="delete">
-                                    <button type="button" id="deleteBtn">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
+                        </tr>
+                        }
                     </table>
                 </table>
             </div>
@@ -167,6 +174,7 @@
                                     <th>Tình trạng</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 <tr>
                                     <td id="facility">1</td>
@@ -194,8 +202,8 @@
                     <h3 class="deviceAddModal">Thêm thiết bị</h3>
                 </div>
                 <div class="modal-body">
-                    <form action="#" method="post">
-                        <div class="form-group-title">
+                <form asp-action="Thietbi_Add" method="post">
+                        <div class="deviceAdd-form">
                             <div>
                                 <i class="fa-solid fa-info-circle" style="margin-right: 0.5rem;"></i>
                                 Thông tin chung
@@ -218,7 +226,7 @@
                             </div>
                         </div><br>
 
-                        <div class="form-group-title"> 
+                        <div class="deviceAdd-form"> 
                             <div>
                                 <i class="fa-solid fa-list-ul" style="margin-right: 0.5rem;"></i>
                                 Các mã series
@@ -409,7 +417,7 @@
 
             //Modal chi tiết thiết bị 
             document.querySelectorAll("#dataTable tbody tr").forEach(function(row) {
-                row.querySelector("td:nth-child(6) button").addEventListener("click", function() {
+                row.querySelector("td:nth-child(7) button").addEventListener("click", function() {
                     // Hiển thị modal
                     document.getElementById("deviceDetailModal").style.display = "flex";
                 });
